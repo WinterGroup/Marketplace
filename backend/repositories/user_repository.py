@@ -1,24 +1,23 @@
-from database.session import session, connection
+from db.session import session, connection
+from schemas.user import User
 from schemas.user_model import UserModel
-from schemas.user_table import UserTable
 from typing import Optional
-
+import sqlalchemy
 class UserRepository:
 	def __init__(self, session) -> None:
 		self.session = session
 
 	@connection
 	def create(self, user: UserModel) -> Optional[UserModel] | bool:
-		found = self.session.query(UserTable).filter_by(username=username).first()
-		if found:
+		try:
+			self.session.add(User(**user.dict()))
+			self.session.commit()
+			return user
+		except sqlalchemy.exc.IntegrityError:
 			return False
-		self.session.add(user)
-		self.session.commit()
-		return user
-
 	@connection
 	def delete(self, username: str) -> bool:
-		found = self.session.query(UserTable).filter_by(username=username).first()
+		found = self.session.query(User).filter_by(username=username).first()
 		if found:
 			self.session.delete(found)
 			self.session.commit()
@@ -27,13 +26,13 @@ class UserRepository:
 
 	@connection
 	def getByUsername(self, username: str) -> Optional[UserModel]:
-		return self.session.query(UserTable).filter_by(username=username).first()
+		return self.session.query(User).filter_by(username=username).first()
 
 	@connection
 	def getById(self, id: int) -> Optional[UserModel]:
-		return self.session.query(UserTable).filter_by(id=id).first()
+		return self.session.query(User).filter_by(id=id).first()
 
 		
 	
-def GetUserRepository() -> UserRepository:
+def getUserRepository() -> UserRepository:
 	return UserRepository(session)

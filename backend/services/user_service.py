@@ -1,5 +1,6 @@
-from repositories.user_repository import UserRepository, GetUserRepository
-from schemas.user_model import user_model
+from repositories.user_repository import UserRepository, getUserRepository
+from schemas.user import User
+from schemas.user_model import UserModel
 from typing import Optional
 
 class UserService:
@@ -12,11 +13,11 @@ class UserService:
 	def delete(self, username: str) -> bool:
 		return self.repository.delete(username)
 
-	def getByUsername(self, username: str) -> Optional[UserModel]
+	def getByUsername(self, username: str) -> Optional[UserModel]:
 		return self.repository.getByUsername(username)
 
 	def getById(self, id: int) -> Optional[UserModel]:
 		return self.repository.getById(id) 
 
-def GetUserService() -> UserService:
-	return UserService(GetUserRepository)
+def getUserService() -> UserService:
+	return UserService(getUserRepository())

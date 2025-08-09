@@ -19,5 +19,8 @@ class UserService:
 	def getById(self, id: int) -> Optional[UserModel]:
 		return self.repository.getById(id) 
 
+	def validatePassword(self, username: str, password: str) -> Optional[bool]:
+		return self.repository.validatePassword(username, password)
+		
 def getUserService() -> UserService:
 	return UserService(getUserRepository())

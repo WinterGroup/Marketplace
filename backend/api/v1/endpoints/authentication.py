@@ -4,8 +4,8 @@ from schemas.user_model import UserModel
 router = APIRouter(prefix="/auth")
 
 @router.post("/login")
-def login(username: str, password: str):
-	return None
+def login(username: str, password: str, service: getUserService = Depends()):
+	return service.validatePassword(username, password)
 
 @router.post("/register")
 def register(username: str, email: str, password: str, service: getUserService = Depends()):

@@ -3,6 +3,7 @@ from api.v1.endpoints.main import router as main_router
 from api.v1.endpoints.authentication import router as auth_router
 from db.session import session, Base, engine
 import uvicorn
+import os
 
 def app() -> FastAPI:
 	application = FastAPI(root_path="/api")

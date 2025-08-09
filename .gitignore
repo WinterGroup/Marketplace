@@ -3,5 +3,5 @@ backend/bin
 backend/lib
 backend/lib64
 backend/include
-__pycache__
+/__pycache__
 backend/db/lite_database.db

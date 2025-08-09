@@ -1,0 +1,38 @@
+.
+├── api
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-312.pyc
+│   └── v1
+│       ├── endpoints
+│       │   ├── authentication.py
+│       │   ├── main.py
+│       │   └── __pycache__
+│       │       └── main.cpython-312.pyc
+│       ├── __init__.py
+│       └── __pycache__
+│           └── __init__.cpython-312.pyc
+├── arhchitecture.txt
+├── core
+│   ├── config.py
+│   └── __init__.py
+├── db
+│   └── __init__.py
+├── docker-compose.yaml
+├── Dockerfile
+├── __init__.py
+├── main.py
+├── middlewares
+│   └── __init__.py
+├── __pycache__
+│   └── main.cpython-312.pyc
+├── repositories
+│   ├── __init__.py
+│   └── user_repository.py
+├── services
+│   ├── __init__.py
+│   └── user_service.py
+└── tests
+    └── indexTest.py
+
+14 directories, 22 files

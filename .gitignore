@@ -64,3 +64,8 @@ backend/api/v1/endpoints/__pycache__/authentication.cpython-312.pyc
 backend/api/v1/endpoints/__pycache__/main.cpython-312.pyc
 backend/repositories/__pycache__/user_repository.cpython-312.pyc
 backend/services/__pycache__/user_service.cpython-312.pyc
+backend/bin
+backend/lib
+backend/lib64
+backend/include
+backend/pyvenv.cfg

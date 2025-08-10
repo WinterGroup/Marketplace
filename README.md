@@ -1,8 +1,30 @@
-stack:
-Python
-Fastapi
-Redis
-SQLAlchemy
-Clean Architecture
-authorization: at first jwt, oauth2 later
-<img width="723" height="262" alt="image" src="https://github.com/user-attachments/assets/b6293284-70a6-41b2-aa5c-8d6af46afb73" />
+
+## Authentication endpoints
+
+#### login into user
+
+```http
+  POST /api/auth/login
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **Required**       |
+| `password` | `string` | **Required**       |
+
+#### log out from user
+```http
+  POST /api/auth/logout
+```
+
+### register
+
+```http
+  POST /api/auth/register
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **Required**       |
+| `email` | `string` | **Required**       |
+| `password` | `string` | **Required**       |

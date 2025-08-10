@@ -4,3 +4,4 @@ sqlalchemy
 pydantic
 cryptography
 uvicorn
+pyjwt

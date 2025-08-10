@@ -1,19 +1,28 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from services.user_service import getUserService
 from schemas.user_model import UserModel
+from datetime import datetime, timedelta, timezone
+from api.v1.dependencies.authentication import *
+import jwt
+import os
+
 router = APIRouter(prefix="/auth")
 
 @router.post("/login")
-def login(username: str, password: str, service: getUserService = Depends()):
-	return service.validatePassword(username, password)
+def login(username: str, password: str, response: Response, service: getUserService = Depends()):
+	if service.validatePassword(username, password):
+		createToken(username, response)
+		return True
+	return False
 
-@router.post("/register")
-def register(username: str, email: str, password: str, service: getUserService = Depends()):
+@router.post("/register", response_model=UserModel)
+def register(username: str, email: str, password: str, response: Response, service: getUserService = Depends()):
 	user = service.create(UserModel(username=username, email=email, password=password))
 	if not user:
-		return "User already exists"
+		return "User already exists or email already in use."
+	createToken(username, response)
 	return user
 
 @router.post("/logout")
-def logout():
-	return None
+def logout(response: Response):
+	return response.delete_cookie(key="jwt")

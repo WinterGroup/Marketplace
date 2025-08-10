@@ -5,3 +5,4 @@ pydantic
 cryptography
 uvicorn
 pyjwt
+dotenv

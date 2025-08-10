@@ -1,9 +1,66 @@
-backend/pyvenv.cfg
-backend/bin
-backend/lib
-backend/lib64
-backend/include
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+*.pyc
 *$py.class
-backend/db/lite_database.db
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Databases
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE / Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Byte-compiled, optimized, and DLL files
+*.so
+*.dll
+
+# pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# pipenv
+Pipfile.lock
+
+# backups
+*.bak
+*.tmp
+
+# Jupyter
+.ipynb_checkpoints/
+backend/api/v1/endpoints/__pycache__/authentication.cpython-312.pyc
+backend/api/v1/endpoints/__pycache__/main.cpython-312.pyc
+backend/repositories/__pycache__/user_repository.cpython-312.pyc
+backend/services/__pycache__/user_service.cpython-312.pyc

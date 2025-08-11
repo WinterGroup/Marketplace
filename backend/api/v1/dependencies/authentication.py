@@ -8,7 +8,7 @@ def getCurrentUser(request: Request):
 					    detail="Unauthorized",
 					    headers={"WWW-Authenticate": "Bearer"})
 	try:	
-		if token := request.cookies.get('jwt'):
+		if token := request.cookies.get('access'):
 			return jwt.decode(token, os.environ.get("JWT_KEY"), algorithms="HS256")["username"]
 		raise exc
 	except jwt.PyJWTError:
@@ -16,6 +16,8 @@ def getCurrentUser(request: Request):
 
 
 def createToken(username: str, response: Response):
-	token = jwt.encode({"username": username}, os.environ.get("JWT_KEY"), algorithm="HS256")
-	response.set_cookie(key="jwt", value=token, expires=datetime.now(timezone.utc)+timedelta(hours=7), httponly=True)
-	return token
+	access_token = jwt.encode({"username": username, "type": "bearer"}, os.environ.get("JWT_KEY"), algorithm="HS256")
+	refresh_token = jwt.encode({"username": "username", "type": "refresh_token"}, os.environ.get("JWT_KEY"), algorithm="HS256")
+	response.set_cookie(key="access", value=access_token, expires=datetime.now(timezone.utc)+timedelta(hours=7))
+	response.set_cookie(key="refresh", value=refresh_token, expires=datetime.now(timezone.utc)+timedelta(days=7))
+	return access_token

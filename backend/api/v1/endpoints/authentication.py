@@ -25,4 +25,5 @@ def register(username: str, email: str, password: str, response: Response, servi
 
 @router.post("/logout")
 def logout(response: Response):
-	return response.delete_cookie(key="jwt")
+	response.delete_cookie(key="access")
+	response.delete_cookie(key="refresh")

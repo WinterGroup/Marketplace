@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ModeToggle } from "./mode-toggle"
+import { ModeToggle } from "../mode-toggle"
 import Image from "next/image"
 
 export default function Header() {

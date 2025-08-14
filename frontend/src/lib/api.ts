@@ -10,7 +10,8 @@ export async function apiRequest<T, D = unknown>(
   const response = await fetch(`${API_BACKEND}${endpoint}`, {
     method,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      
     },
     body: data ? JSON.stringify(data) : undefined
   });
@@ -18,6 +19,5 @@ export async function apiRequest<T, D = unknown>(
   if (!response.ok) {
     throw new Error(`Request failed: ${response.statusText}`);
   }
-
   return response.json() as Promise<T>;
 }

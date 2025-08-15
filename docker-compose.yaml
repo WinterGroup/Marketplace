@@ -8,5 +8,10 @@ services:
     command: python3 main.py
     volumes:
       - .:/backend
-
-
+  client:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    command: npm start
+    volumes:
+      - .:/app

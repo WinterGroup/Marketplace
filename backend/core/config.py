@@ -9,3 +9,7 @@ class DATABASE:
 	def ADDRESS(self):
 		#return f"postgresql+psycopg2://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 		return f"sqlite:///db/lite_database.db"
+		
+class KAFKA:
+	HOST = 'localhost:9092'
+	TRANSACTION_TOPIC = "TRANSACTION_TOPIC"

@@ -6,3 +6,4 @@ cryptography
 uvicorn
 pyjwt
 dotenv
+kafka

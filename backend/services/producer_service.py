@@ -8,5 +8,8 @@ class ProducerService():
 	def send(self, model: BaseModel) -> BaseModel:
 		return self.repository.send(model)
 
+	def sendMessage(self, string: str) -> str:
+		return self.repository.send(string)
+		
 def getProducerService() -> ProducerService:
 	return ProducerService(getProducerRepository())

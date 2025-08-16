@@ -3,10 +3,6 @@ from core.config import KAFKA
 from typing import Callable
 import json
 
-producer = KafkaProducer(
-	bootstrap_servers=KAFKA.HOST,
-	value_serializer=lambda v: json.dumps(v).encode("utf-8")
-	)
 
 def producerExitDecorator(func: Callable) -> Callable:
 	def wraper(*args, **kwargs):

@@ -8,6 +8,7 @@ class UserService:
 	def __init__(self, repository: UserRepository, redis_repository: RedisRepository) -> None:
 		self.repository = repository
 		self.redis_client = redis_repository
+		
 	def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		return self.repository.create(user)
 
@@ -19,12 +20,10 @@ class UserService:
 		user = self.redis_client.getItem(username)
 		if user:
 			return user
-
 		user = self.repository.getByUsername(username)
 		if user:
 			self.redis_client.setItem(username, user)
 			return user
-
 		return None
 
 
@@ -32,12 +31,10 @@ class UserService:
 		user = self.redis_client.getItem(id)
 		if user:
 			return user
-
 		user = self.repository.getById(id)
 		if user:
 			self.redis_client.set(id, user)
 			return user
-
 		return None
 
 	def validatePassword(self, username: str, password: str) -> Optional[bool]:

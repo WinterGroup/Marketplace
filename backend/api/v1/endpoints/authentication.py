@@ -20,6 +20,7 @@ def register(username: str, email: str, password: str, response: Response, servi
 	user = service.create(UserModel(username=username, email=email, password=password))
 	if not user:
 		return "User already exists or email already in use."
+	# да да я знаю про dependency injection
 	createToken(username, response)
 	return user
 

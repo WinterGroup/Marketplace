@@ -3,7 +3,6 @@ from api.v1.endpoints.main import router as main_router
 from api.v1.endpoints.authentication import router as auth_router
 from db.session import session, Base, engine
 from middlewares.refresh_token_middleware import RefreshTokenMiddleware
-from db.producer import producer
 import uvicorn
 import os
 
@@ -15,13 +14,11 @@ def app() -> FastAPI:
 
 	@application.on_event("startup")
 	def startup():
-		producer.start()
 		Base.metadata.create_all(engine)
 
 	@application.on_event("shutdown")
 	def shutdown():
 		session.close()
-		producer.stop()
 
 	return application
 

@@ -1,11 +1,14 @@
-from db.producer import producer, producerExitDecorator
+from db.producer import producerExitDecorator
 from core.config import KAFKA
 from kafka import KafkaProducer
 from pydantic import BaseModel
-class ProducerRepository(object):
-	def __init__(self, producer: KafkaProducer) -> None:
-		self.producer = producer
 
+class ProducerRepository(object):
+	def __init__(self) -> None:
+		self.producer = KafkaProducer(
+			bootstrap_servers=KAFKA.HOST,
+			value_serializer=lambda v: json.dumps(v).encode("utf-8")
+			)
 	@producerExitDecorator
 	def send(self, model: BaseModel) -> BaseModel:
 		self.producer.send(
@@ -13,6 +16,14 @@ class ProducerRepository(object):
 			value=bytes(model).encode()
 		)
 		return model
+
+	@producerExitDecorator
+	def sendString(self, string: str) -> str:
+		self.producer.send(
+			topic=KAFKA.MESSAGE_TOPIC,
+			value=bytes(string).encode()
+		)
+		return string
 
 def GetProducerRepository() -> ProducerRepository:
 	return ProducerRepository(producer)

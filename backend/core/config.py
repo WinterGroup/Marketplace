@@ -14,3 +14,7 @@ class KAFKA:
 	HOST = 'localhost:9092'
 	TRANSACTION_TOPIC = "TRANSACTION_TOPIC"
 	MESSAGE_TOPIC = "MESSAGE_TOPIC"
+
+class REDIS:
+	HOST: str = "localhost"
+	PORT: int = 6379

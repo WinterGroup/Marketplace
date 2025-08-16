@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from api.v1.endpoints.main import router as main_router
 from api.v1.endpoints.authentication import router as auth_router
 from db.session import session, Base, engine
-from middlewares.RefreshTokenMiddleware import RefreshTokenMiddleware
+from middlewares.refresh_token_middleware import RefreshTokenMiddleware
 import uvicorn
 import os
 

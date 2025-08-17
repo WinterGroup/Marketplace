@@ -69,3 +69,5 @@ backend/lib
 backend/lib64
 backend/include
 backend/pyvenv.cfg
+backend/api/v1/endpoints/__pycache__/authentication.cpython-312.pyc
+backend/api/v1/endpoints/__pycache__/main.cpython-312.pyc

@@ -26,3 +26,20 @@ export async function LoginRequest(
     data
   );
 }
+
+
+export async function LogoutRequest(): Promise<void> {
+  return apiRequest<void>(`/auth/logout/`, "POST");
+}
+
+
+
+export async function RegisterRequest(
+  data: RegisterInterface
+): Promise<AuthResponse> {
+  return apiRequest<AuthResponse, RegisterInterface>(
+    `/auth/register/`,
+    "POST",
+    data
+  );
+}

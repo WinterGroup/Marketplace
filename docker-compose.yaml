@@ -5,13 +5,14 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
-    command: python3 main.py
     volumes:
-      - .:/backend
+      - ./backend:/backend
+    command: python3 main.py
+
   client:
     build: ./frontend
     ports:
       - "3000:3000"
-    command: npm start
     volumes:
-      - .:/app
+      - ./frontend:/app:cached
+    command: npm start

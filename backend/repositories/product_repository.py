@@ -4,7 +4,7 @@ from schemas.product_model import ProductModel
 from typing import Optional, List
 import sqlalchemy
 
-class ProductRepository:
+class ProductRepository():
 	def __init__(self, session):
 		self.session = session
 
@@ -25,9 +25,19 @@ class ProductRepository:
 			self.session.commit()
 			return True
 		return None
+
 	@connection
 	def searchByUsername(self, username: str) -> List[ProductModel]:
 		return self.session.query(ProductTable).filter_by(username=username).all()
+
+	@connection
+	def getById(self, id: int) -> Optional[ProductModel]:
+		product = self.session.query(ProductTable).filter_by(id=id).first()
+		return product if product else None
+
+	@connection
+	def getAll(self) -> List[ProductModel]:
+		return self.session.query(ProductTable).all()
 
 def getProductRepository() -> ProductRepository:
 	return ProductRepository(session)

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from api.v1.dependencies.authentication import getCurrentUser
+
 router = APIRouter()
 
 @router.get('/')

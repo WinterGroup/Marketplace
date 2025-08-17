@@ -8,7 +8,8 @@ class ProducerRepository(object):
 		self.producer = KafkaProducer(
 			bootstrap_servers=KAFKA.HOST,
 			value_serializer=lambda v: json.dumps(v).encode("utf-8")
-			)
+		)
+
 	@producerExitDecorator
 	def send(self, model: BaseModel) -> BaseModel:
 		self.producer.send(

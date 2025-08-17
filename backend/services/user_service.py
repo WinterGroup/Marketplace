@@ -33,7 +33,7 @@ class UserService:
 			return user
 		user = self.repository.getById(id)
 		if user:
-			self.redis_client.set(id, user)
+			self.redis_client.setItem(id, user)
 			return user
 		return None
 

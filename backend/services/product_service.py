@@ -1,4 +1,4 @@
-from repositories.product_repository import ProductRepository
+from repositories.product_repository import ProductRepository, getProductRepository
 from schemas.product_model import ProductModel
 from typing import Optional, List
 
@@ -14,4 +14,12 @@ class ProductService():
 
 	def searchByUsername(self, username: str) -> List[ProductModel]:
 		return self.repository.searchByUsername(username)
-		
+	
+	def getById(self, id: int) -> Optional[ProductModel]:
+		return self.repository.getById(id)
+
+	def getAll(self) -> List[ProductModel]:
+		return self.repository.getAll()
+
+def getProductService() -> ProductService:
+	return ProductService(getProductRepository())

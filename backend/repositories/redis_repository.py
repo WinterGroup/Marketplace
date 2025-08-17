@@ -6,7 +6,7 @@ import redis
 import pickle # i am pickle rick :)
 
 class RedisRepository:
-	def __init__() -> None:
+	def __init__(self) -> None:
 		self.client = redis.Redis(
 			host=REDIS.HOST,
 			port=REDIS.PORT

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from api.v1.endpoints.main import router as main_router
 from api.v1.endpoints.authentication import router as auth_router
+from api.v1.endpoints.users import router as users_router
+from api.v1.endpoints.products import router as products_router
 from db.session import session, Base, engine
 from middlewares.refresh_token_middleware import RefreshTokenMiddleware
 import uvicorn
@@ -10,6 +12,8 @@ def app() -> FastAPI:
 	application = FastAPI(root_path="/api")
 	application.include_router(main_router)
 	application.include_router(auth_router)
+	application.include_router(users_router)
+	application.include_router(products_router)
 	application.add_middleware(RefreshTokenMiddleware)
 
 	@application.on_event("startup")

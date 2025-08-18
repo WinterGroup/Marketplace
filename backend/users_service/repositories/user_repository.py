@@ -1,6 +1,6 @@
 from db.session import session, connection
-from schemas.user import User
-from schemas.user_model import UserModel
+from tables.user_table import User
+from models.user_model import UserModel 
 from typing import Optional
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
@@ -11,6 +11,7 @@ class UserRepository:
 	def __init__(self, session) -> None:
 		self.session = session
 		self.f = Fernet(os.environ.get("SECRET_KEY").encode())
+
 	@connection
 	def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		try:
@@ -20,6 +21,7 @@ class UserRepository:
 			return user
 		except sqlalchemy.exc.IntegrityError:
 			return False
+			
 	@connection
 	def delete(self, username: str) -> bool:
 		found = self.session.query(User).filter_by(username=username).first()

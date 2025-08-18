@@ -1,14 +1,16 @@
-from repositories.user_repository import UserRepository, getUserRepository
-from schemas.user import User
-from schemas.user_model import UserModel
-from typing import Optional
 from repositories.redis_repository import RedisRepository, getRedisRepository
+from repositories.user_repository import UserRepository, getUserRepository
+from tables.user_table import User
+from models.user_model import UserModel
+from typing import Optional
+import redis
+import pickle
 
-class UserService:
+class UserDAO:
 	def __init__(self, repository: UserRepository, redis_repository: RedisRepository) -> None:
 		self.repository = repository
 		self.redis_client = redis_repository
-		
+
 	def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		return self.repository.create(user)
 
@@ -40,5 +42,5 @@ class UserService:
 	def validatePassword(self, username: str, password: str) -> Optional[bool]:
 		return self.repository.validatePassword(username, password)
 		
-def getUserService() -> UserService:
-	return UserService(getUserRepository(), getRedisRepository())
+def getUserDAO() -> UserDAO:
+	return UserDAO(getUserRepository(), getRedisRepository())

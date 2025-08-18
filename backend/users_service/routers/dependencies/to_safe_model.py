@@ -1,5 +1,5 @@
-from schemas.safe_user_model import SafeUserModel
-from schemas.user_model import UserModel
+from models.safe_user_model import SafeUserModel
+from models.user_model import UserModel
 
 def toSafeModel(user: UserModel) -> SafeUserModel:
 	return SafeUserModel(

@@ -1,9 +1,0 @@
-from schemas.safe_user_model import SafeUserModel
-from schemas.user_model import UserModel
-
-def toSafeModel(user: UserModel) -> SafeUserModel:
-	return SafeUserModel(
-		id=user.id, 
-		username=user.username,
-		email=user.email
-	)

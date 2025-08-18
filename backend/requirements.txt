@@ -1,9 +1,0 @@
-fastapi
-redis
-sqlalchemy
-pydantic
-cryptography
-uvicorn
-pyjwt
-dotenv
-kafka

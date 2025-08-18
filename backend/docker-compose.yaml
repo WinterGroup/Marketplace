@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+    users_service:
+        build: ./users_service
+        command: python3 app/main.py
+        volumes:
+            - ./users_service/:/app
+        ports:
+            - 8001:8000
+
+    product_service:
+        build: ./product_service
+        command: python3 app/main.py
+        volumes:
+           - ./product_service/:/app
+        ports:
+            - 8002:8000
+            
+    db:
+        image: postgres:latest
+        environment:
+            POSTGRES_DB: db
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - "5432:5432"

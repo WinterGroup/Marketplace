@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuth, AuthInterface } from '@/hooks/useAuth';
 import { LoginInterface } from '@/lib/auth-api';
 
@@ -9,31 +9,24 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (data: LoginInterface) => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { auth, error, loading, login } = useAuth();
-  const [user, setUser] = useState<AuthInterface | null>(auth);
-
-  useEffect(() => {
-    setUser(auth);
-  }, [auth]);
+  const { auth, error, loading, login, logout } = useAuth();
 
   const signIn = async (data: LoginInterface) => {
-    await login(data); 
+    await login(data);
   };
 
-  const signOut = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    setUser(null);
+  const signOut = async () => {
+    await logout();
   };
 
   return (
-    <AuthContext.Provider value={{ auth: user, loading, error, signIn, signOut }}>
+    <AuthContext.Provider value={{ auth, loading, error, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

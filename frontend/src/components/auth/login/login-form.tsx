@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuthContext } from "@/contexts/auth-context"
 
 import {
   Form,
@@ -27,7 +27,7 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginForm() {
   const router = useRouter()
-  const { login, loading } = useAuth()
+  const { signIn, loading } = useAuthContext()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -39,13 +39,14 @@ export default function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
-      await login(values)
+      await signIn(values)
       toast.success("Добро пожаловать!")
       router.push("/")
     }
     catch (err: unknown) {
+      toast.error("Ошибка авторизации")
       if (err instanceof Error) {
-        console.error(err.message);
+        console.error(err.message)
       }
     }
   }
@@ -85,7 +86,11 @@ export default function LoginForm() {
             )}
           />
 
-          <Button type="submit" disabled={loading || form.formState.isSubmitting} className="w-full">
+          <Button 
+            type="submit" 
+            disabled={loading || form.formState.isSubmitting} 
+            className="w-full"
+          >
             {loading ? "Загрузка..." : "Войти"}
           </Button>
         </form>

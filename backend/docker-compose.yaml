@@ -52,6 +52,7 @@ services:
         restart: unless-stopped
         networks:
             - app-network
-networks:
+            
+ networks:
     app-network:
         driver: bridge

@@ -26,12 +26,12 @@ def logout(response: Response):
 	response.delete_cookie(key="access")
 	response.delete_cookie(key="refresh")
 
-@router.get("/search/id")
+@router.get("/search")
 def getById(id: int, service: getUserDAO = Depends()):
 	user = service.getById(id)
 	return toSafeModel(user) if user else None
 
-@router.get("/search/username")
+@router.get("/get/{username}")
 def getByUsername(username: str, service: getUserDAO = Depends()):
 	user = service.getByUsername(username)
 	return toSafeModel(user) if user else None

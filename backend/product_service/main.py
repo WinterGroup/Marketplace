@@ -4,7 +4,7 @@ from db.session import engine, Base, session
 import uvicorn
 
 def app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(root_path="/api")
     app.include_router(product_router)
     
     @app.on_event("startup")

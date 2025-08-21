@@ -4,3 +4,4 @@ class UserModel(BaseModel):
 	username: str
 	email: str
 	password: str
+	account_status: str

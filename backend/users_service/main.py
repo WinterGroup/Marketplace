@@ -4,7 +4,7 @@ from db.session import engine, Base, session
 import uvicorn
 
 def app() -> FastAPI:
-    app = FastAPI(root_path="/api")
+    app = FastAPI()
     app.include_router(users_router)
     @app.on_event("startup")
     def startup():
@@ -19,5 +19,5 @@ def app() -> FastAPI:
 app = app()
 
 if __name__ == "__main__":
-	uvicorn.run("main:app", host="localhost", port=8000, reload=True)
+	uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
 

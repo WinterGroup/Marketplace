@@ -1,29 +1,57 @@
-version: "3.7"
+version: "3.8"
 
 services:
+    nginx:
+        image: nginx:alpine
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+        depends_on:
+            - users_service
+            - product_service
+        restart: unless-stopped 
+        networks:
+            - app-network
     db:
-        image: postgres:latest
+        image: postgres
         environment: 
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: db
-            PGDATA: /var/lib/postgresql/data/pgdata
-        ports:
-            - "5432:5432"
+        restart: unless-stopped
+        networks:
+            - app-network
+    redis:
+        image: redis:latest
+        restart: always
+        networks:
+            - app-network
     users_service:
-        build: ./users_service
+        build: ./users_service/
+        container_name: users_service
         volumes:
             - ./users_service/:/app
         ports:
             - "8001:8000"
-        environment:
-            DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
+        depends_on:
+            - db
+        restart: unless-stopped
+        networks:
+            - app-network
     product_service:
         build: ./product_service
+        container_name: product_service
         volumes:
-           - ./product_service/:/app
+            - ./product_service/:/app
         ports:
             - "8002:8000"
-        environment:
-            DATABASE_URL: postgresql://postgres:postgres@localhost:5432/db
-
+        depends_on:
+            - db
+        restart: unless-stopped
+        networks:
+            - app-network
+networks:
+    app-network:
+        driver: bridge

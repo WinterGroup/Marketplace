@@ -14,8 +14,8 @@ def login(username: str, password: str, response: Response, service: getUserDAO 
 	return False
 
 @router.post("/register", response_model=UserModel)
-def register(username: str, email: str, password: str, response: Response, service: getUserDAO = Depends()):
-	user = service.create(UserModel(username=username, email=email, password=password))
+def register(username: str, email: str, password: str,account_status: str, response: Response, service: getUserDAO = Depends()):
+	user = service.create(UserModel(username=username, email=email, password=password, account_status=account_status))
 	if not user:
 		return "User already exists or email already in use."
 	createToken(username, response)

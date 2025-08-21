@@ -3,17 +3,19 @@ version: "3.8"
 services:
     nginx:
         image: nginx:alpine
+        container_name: nginx_proxy
         ports:
-            - "80:80"
-            - "443:443"
+          - "80:80"
+          - "443:443"
         volumes:
-            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+          - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+          - ./nginx/conf.d:/etc/nginx/conf.d
         depends_on:
-            - users_service
-            - product_service
-        restart: unless-stopped 
+          - users_service
+          - product_service
         networks:
-            - app-network
+          - app-network
+        restart: unless-stopped
     db:
         image: postgres
         environment: 
@@ -24,10 +26,15 @@ services:
         networks:
             - app-network
     redis:
-        image: redis:latest
+        image: redis:7-alpine
+        container_name: redis_cache
         restart: always
+        volumes:
+            - redis_data:/data
         networks:
             - app-network
+        command: redis-server --bind 0.0.0.0
+
     users_service:
         build: ./users_service/
         container_name: users_service
@@ -37,9 +44,13 @@ services:
             - "8001:8000"
         depends_on:
             - db
+            - redis
         restart: unless-stopped
         networks:
             - app-network
+        environment:
+            SECRET_KEY: ${SECRET_KEY}
+            JWT_KEY: ${JWT_KEY}
     product_service:
         build: ./product_service
         container_name: product_service
@@ -49,9 +60,14 @@ services:
             - "8002:8000"
         depends_on:
             - db
+            - redis
         restart: unless-stopped
         networks:
             - app-network
 networks:
     app-network:
         driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

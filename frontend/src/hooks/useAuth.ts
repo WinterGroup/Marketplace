@@ -1,10 +1,11 @@
 'use client'
+
 import { useState, useEffect } from "react";
-import { LoginRequest, LoginInterface } from "@/lib/auth-api";
+import { LoginRequest, LoginInterface, MeRequest, LogoutRequest } from "@/lib/auth-api";
 
 export interface AuthInterface {
-  access_token: string;
-  refresh_token: string;
+  username: string;
+  email: string;
 }
 
 export function useAuth() {
@@ -12,26 +13,31 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  // при загрузке проверяем, есть ли активная сессия (кука)
   useEffect(() => {
-    const access_token = localStorage.getItem('access_token');
-    const refresh_token = localStorage.getItem('refresh_token');
-    if (access_token && refresh_token) {
-      setAuth({ access_token, refresh_token });
-    }
+    const checkAuth = async () => {
+      try {
+        setLoading(true);
+        const user = await MeRequest();
+        setAuth(user);
+      } catch {
+        setAuth(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
   }, []);
 
   const login = async (data: LoginInterface) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await LoginRequest(data);
-      if (response.access_token && response.refresh_token) {
-        localStorage.setItem('access_token', response.access_token);
-        localStorage.setItem('refresh_token', response.refresh_token);
-        setAuth({
-          access_token: response.access_token,
-          refresh_token: response.refresh_token
-        });
+      const success = await LoginRequest(data);
+      if (success) {
+        // после логина кука установится, подтянем юзера
+        const user = await MeRequest();
+        setAuth(user);
       } else {
         throw new Error("Invalid login response");
       }
@@ -43,5 +49,15 @@ export function useAuth() {
     }
   };
 
-  return { auth, error, loading, login };
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await LogoutRequest();
+      setAuth(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { auth, error, loading, login, logout };
 }

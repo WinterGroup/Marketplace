@@ -64,10 +64,14 @@ services:
         restart: unless-stopped
         networks:
             - app-network
-networks:
+            
+ networks:
     app-network:
         driver: bridge
+<<<<<<< HEAD
 
 volumes:
   postgres_data:
   redis_data:
+=======
+>>>>>>> refs/remotes/origin/main

@@ -3,8 +3,6 @@ from typing import Optional
 import pickle
 import redis
 
-
-
 class RedisRepository():
 	def __init__(self):
 		self.r = redis.Redis(

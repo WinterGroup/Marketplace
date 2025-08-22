@@ -40,11 +40,11 @@ class UserRepository:
 		return self.session.query(User).filter_by(id=id).first()
 
 	@connection
-	def validatePassword(self, username: str, password: str) -> Optional[bool]:
+	def validatePassword(self, username: str, password: str) -> Optional[list]:
 		user = self.session.query(User).filter_by(username=username).first()
 		if user:
 			if self.f.decrypt(user.password).decode('utf-8') == password:
-				return True
+				return [True, user.account_status]
 			return False
 		return None
 	

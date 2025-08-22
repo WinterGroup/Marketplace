@@ -39,7 +39,7 @@ class UserDAO:
 			return user
 		return None
 
-	def validatePassword(self, username: str, password: str) -> Optional[bool]:
+	def validatePassword(self, username: str, password: str) -> Optional[list]:
 		return self.repository.validatePassword(username, password)
 		
 def getUserDAO() -> UserDAO:

@@ -65,6 +65,20 @@ services:
         networks:
             - app-network
 
+    orders_service:
+        build: ./backend/orders_service
+        container_name: orders_service
+        volumes:
+            - ./backend/orders_service/:/app
+        ports:
+            - "8003:8000"
+        depends_on:
+            - db
+            - redis
+        restart: unless-stopped
+        networks:
+            - app-network
+
 networks:
     app-network:
         driver: bridge

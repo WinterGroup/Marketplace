@@ -38,5 +38,5 @@ def getByUsername(username: str, service: getUserDAO = Depends()):
 
 @router.get("/me")
 def getMe(me: getCurrentUser = Depends(), service: getUserDAO = Depends()):
-	user = service.getUserByUsername(me)
+	user = service.getByUsername(me)
 	return toSafeModel(user) if user else None

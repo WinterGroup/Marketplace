@@ -17,8 +17,8 @@ def getCurrentUser(request: Request):
 		raise exc
 
 
-def createToken(username: str, response: Response):
-	access_token = jwt.encode({"username": username, "type": "bearer"}, os.environ.get("JWT_KEY"), algorithm="HS256")
+def createToken(username: str, account_status: str, response: Response):
+	access_token = jwt.encode({"username": username, "type": "bearer", "account_status": account_status}, os.environ.get("JWT_KEY"), algorithm="HS256")
 	refresh_token = jwt.encode({"username": "username", "type": "refresh_token"}, os.environ.get("JWT_KEY"), algorithm="HS256")
 	response.set_cookie(key="access", value=access_token, expires=datetime.now(timezone.utc)+timedelta(hours=7))
 	response.set_cookie(key="refresh", value=refresh_token, expires=datetime.now(timezone.utc)+timedelta(days=7))

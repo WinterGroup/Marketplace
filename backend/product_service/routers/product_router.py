@@ -14,7 +14,3 @@ def getById(id: int, service: getProductDAO = Depends()):
 @router.delete("/delete")
 def deleteByid(id:int, service: getProductDAO = Depends()):
 	return service.delete(id)
-
-@router.get("/test")
-def test():
-	return {"ok"}

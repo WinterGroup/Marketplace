@@ -34,8 +34,7 @@ class UserRepository:
 
 	@connection
 	async def getByUsername(self, username: str) -> Optional[UserModel]:
-		stmt = select(User).where(User.username == username)
-		result = await session.execute(stmt)
+		result = await self.session.execute(select(User).where(User.username == username))
 		return result.scalar_one_or_none()
 
 	@connection
@@ -44,7 +43,8 @@ class UserRepository:
 
 	@connection
 	async def validatePassword(self, username: str, password: str) -> Optional[list]:
-		user = await session.execute(select(User).where(User.username == username)).scalar_one_or_none()
+		result = await self.session(select(User).where(User.username==username))
+		user = result.scallars_one_or_none()
 		if user:
 			if self.f.decrypt(user.password).decode('utf-8') == password:
 				return [True, user.account_status]

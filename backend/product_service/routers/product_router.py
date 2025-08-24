@@ -6,17 +6,16 @@ from typing import Optional, List
 router = APIRouter(prefix="/products")
 
 @router.get("/")
-def getAll(service: getProductDAO = Depends()) -> List[ProductModel]:
-	return service.getAll()
+async def getAll(service: getProductDAO = Depends()) -> List[ProductModel]:
+	return await service.getAll()
 
 @router.get("/search")
-def search(
+async def search(
 		id: int = 0, 
 		username: str = "", 
 		service: getProductDAO = Depends()
 	) -> Optional[ProductModel] | List:
 
-	product = service.getById(id)
 	if username != "":
-		product = service.searchByUsername(username)
-	return product
+		return await service.searchByUsername(username)
+	return await service.getById(id)

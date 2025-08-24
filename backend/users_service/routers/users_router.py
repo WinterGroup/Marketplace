@@ -48,8 +48,8 @@ async def register(
 
 @router.post("/logout") 
 async def logout(response: Response) -> None:
-	await response.delete_cookie(key="access")
-	await response.delete_cookie(key="refresh")
+	response.delete_cookie(key="access")
+	response.delete_cookie(key="refresh")
 
 @router.get("/search")
 async def getById(
@@ -70,3 +70,18 @@ async def getMe(
 
 	user = await service.getByUsername(me)
 	return toSafeModel(user) if user else None
+
+@router.post("/delete")
+def deleteYourSelf(
+		password: str,
+		response: Response,
+		user: getCurrentuser = Depends(),
+		service: getUserDAO = Depends()
+	) -> bool:
+	
+	if await service.validatePassword(user, password):
+		service.deleteByUsername(user)
+		response.delete_cookie(key="access")
+		response.delete_cookie(key="refresh")
+		return True
+	return False

@@ -16,9 +16,13 @@ class UserDAO:
 	async def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		return await self.repository.create(user)
 
-	async def delete(self, username: str) -> bool:
+	async def deleteByUsername(self, username: str) -> bool:
 		await self.redis_client.delete(username)
 		return await self.repository.delete(username)
+
+	async def deleteById(self, id: int) -> bool:
+		await self.redis_client.delete(f"user {id}")
+		return await self.repository.deleteById(id)
 
 	async def getByUsername(self, username: str) -> Optional[UserModel]:
 		user = await self.redis_client.getItem(username)
@@ -32,12 +36,12 @@ class UserDAO:
 
 
 	async def getById(self, id: int) -> Optional[UserModel]:
-		user = await self.redis_client.getItem(id)
+		user = await self.redis_client.getItem(f"user {id}")
 		if user:
 			return user
 		user = await self.repository.getById(id)
 		if user:
-			self.redis_client.setItem(id, user)
+			self.redis_client.setItem(f"user {id}", user)
 			return user
 		return None
 

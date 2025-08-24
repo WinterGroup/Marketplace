@@ -10,7 +10,7 @@ __pycache__/
 venv/
 .env/
 .venv/
-
+.env
 # Databases
 *.db
 *.sqlite3

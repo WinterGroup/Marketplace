@@ -72,10 +72,10 @@ async def getMe(
 	return toSafeModel(user) if user else None
 
 @router.post("/delete")
-def deleteYourSelf(
+async def deleteYourSelf(
 		password: str,
 		response: Response,
-		user: getCurrentuser = Depends(),
+		user: getCurrentUser = Depends(),
 		service: getUserDAO = Depends()
 	) -> bool:
 	

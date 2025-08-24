@@ -8,4 +8,55 @@ to start server
 ```
 $ sudo docker-compose up
 ```
+# All routes
+## Users Service
 
+```
+  POST /api/users/login
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **Required**       |
+| `password` | `string` | **Required**       |
+
+```
+  POST /api/users/register
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **Required**       |
+| `password` | `string` | **Required**       |
+| `email` | `string` | **Required**       |
+| `accounts_status` | `seller/buyer` | **Required**       |
+
+```
+  GET /api/users/me
+```
+```
+  POST /api/users/logout
+```
+```
+  POST /api/users/search
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **optional**       |
+| `id` | `int` | **optional**       |
+
+## Products Service
+```
+  GET /api/products/search
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `username` | `string` | **optional**       |
+| `id` | `int` | **optional**       |
+
+```
+  GET /api/products/
+```
+get all products

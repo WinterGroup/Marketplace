@@ -65,9 +65,9 @@ services:
         networks:
             - app-network
 
-    orders_service:
+    order_service:
         build: ./backend/orders_service
-        container_name: orders_service
+        container_name: order_service
         volumes:
             - ./backend/orders_service/:/app
         ports:

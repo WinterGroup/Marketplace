@@ -41,5 +41,6 @@ class ProductRepository():
 	async def getAll(self) -> List[ProductModel]:
 		result = await self.session.execute(select(ProductTable))
 		return result.scalars().all()
+
 def getProductRepository() -> ProductRepository:
 	return ProductRepository(session)

@@ -24,8 +24,17 @@ class UserRepository:
 			return False
 			
 	@connection
-	async def delete(self, username: str) -> bool:
-		found = await session.execute(select(User).where(User.username == username)).scalar_one_or_none()
+	async def deleteByUsername(self, username: str) -> bool:
+		found = await self.session.execute(select(User).where(User.username == username)).scalar_one_or_none()
+		if found:
+			await self.session.delete(found)
+			await self.session.commit()
+			return True
+		return False
+
+	@connection
+	async def deleteById(self, id: int) -> bool:
+		found = await self.session.get(User, id)
 		if found:
 			await self.session.delete(found)
 			await self.session.commit()

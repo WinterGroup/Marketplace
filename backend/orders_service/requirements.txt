@@ -7,6 +7,6 @@ uvicorn
 pyjwt
 dotenv
 kafka
-psycopg2-binary
+asyncpg
 requests
 

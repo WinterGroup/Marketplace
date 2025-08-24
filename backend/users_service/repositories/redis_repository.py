@@ -19,7 +19,7 @@ class RedisRepository():
 		item = await self.r.get(key)
 		return pickle.loads(item) if item else None
 	
-	async def delete(self, key: Optional[str] | int):
+	async def delete(self, key: Optional[str] | int) -> None:
 		await self.r.delete(key)
 
 

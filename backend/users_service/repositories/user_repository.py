@@ -4,6 +4,7 @@ from models.user_model import UserModel
 from typing import Optional
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
+from sqlalchemy import select
 import sqlalchemy
 import os
 
@@ -13,35 +14,37 @@ class UserRepository:
 		self.f = Fernet(os.environ.get("SECRET_KEY").encode())
 
 	@connection
-	def create(self, user: UserModel) -> Optional[UserModel] | bool:
+	async def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		try:
 			user.password = self.f.encrypt(user.password.encode())
-			self.session.add(User(**user.dict()))
-			self.session.commit()
+			await self.session.add(User(**user.dict()))
+			await self.session.commit()
 			return user
 		except sqlalchemy.exc.IntegrityError:
 			return False
 			
 	@connection
-	def delete(self, username: str) -> bool:
-		found = self.session.query(User).filter_by(username=username).first()
+	async def delete(self, username: str) -> bool:
+		found = await session.execute(select(User).where(User.username == username)).scalar_one_or_none()
 		if found:
-			self.session.delete(found)
-			self.session.commit()
+			await self.session.delete(found)
+			await self.session.commit()
 			return True
 		return False
 
 	@connection
-	def getByUsername(self, username: str) -> Optional[UserModel]:
-		return self.session.query(User).filter_by(username=username).first()
+	async def getByUsername(self, username: str) -> Optional[UserModel]:
+		stmt = select(User).where(User.username == username)
+		result = await session.execute(stmt)
+		return result.scalar_one_or_none()
 
 	@connection
-	def getById(self, id: int) -> Optional[UserModel]:
-		return self.session.query(User).filter_by(id=id).first()
+	async def getById(self, id: int) -> Optional[UserModel]:
+		return await self.session.get(User, id)
 
 	@connection
-	def validatePassword(self, username: str, password: str) -> Optional[list]:
-		user = self.session.query(User).filter_by(username=username).first()
+	async def validatePassword(self, username: str, password: str) -> Optional[list]:
+		user = await session.execute(select(User).where(User.username == username)).scalar_one_or_none()
 		if user:
 			if self.f.decrypt(user.password).decode('utf-8') == password:
 				return [True, user.account_status]

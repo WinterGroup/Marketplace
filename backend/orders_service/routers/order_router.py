@@ -12,6 +12,8 @@ host = "localhost"
 def getOrder(id: int, service: getOrderDAO = Depends()):
     return service.getById(id)
 
+
+# VERYYY DANGEROUS CODE
 @router.post("/create")
 def createOrder(product_id: int, seller_id: int, user: getCurrentUser = Depends(), service: getOrderDAO = Depends()):
     seller = requests.get("http://localhost:8000/api/users/search", json={"id": seller_id}).json()

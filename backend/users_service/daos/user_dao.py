@@ -6,41 +6,43 @@ from typing import Optional
 import redis
 import pickle
 
+#next time i will make code look better
+
 class UserDAO:
 	def __init__(self, repository: UserRepository, redis_repository: RedisRepository) -> None:
 		self.repository = repository
 		self.redis_client = redis_repository
 
-	def create(self, user: UserModel) -> Optional[UserModel] | bool:
-		return self.repository.create(user)
+	async def create(self, user: UserModel) -> Optional[UserModel] | bool:
+		return await self.repository.create(user)
 
-	def delete(self, username: str) -> bool:
-		self.redis_client.delete(username)
-		return self.repository.delete(username)
+	async def delete(self, username: str) -> bool:
+		await self.redis_client.delete(username)
+		return await self.repository.delete(username)
 
-	def getByUsername(self, username: str) -> Optional[UserModel]:
-		user = self.redis_client.getItem(username)
+	async def getByUsername(self, username: str) -> Optional[UserModel]:
+		user = await self.redis_client.getItem(username)
 		if user:
 			return user
-		user = self.repository.getByUsername(username)
+		user = await self.repository.getByUsername(username)
 		if user:
-			self.redis_client.setItem(username, user)
+			await self.redis_client.setItem(username, user)
 			return user
 		return None
 
 
-	def getById(self, id: int) -> Optional[UserModel]:
-		user = self.redis_client.getItem(id)
+	async def getById(self, id: int) -> Optional[UserModel]:
+		user = await self.redis_client.getItem(id)
 		if user:
 			return user
-		user = self.repository.getById(id)
+		user = await self.repository.getById(id)
 		if user:
 			self.redis_client.setItem(id, user)
 			return user
 		return None
 
-	def validatePassword(self, username: str, password: str) -> Optional[list]:
-		return self.repository.validatePassword(username, password)
+	async def validatePassword(self, username: str, password: str) -> Optional[list]:
+		return await self.repository.validatePassword(username, password)
 		
 def getUserDAO() -> UserDAO:
 	return UserDAO(getUserRepository(), getRedisRepository())

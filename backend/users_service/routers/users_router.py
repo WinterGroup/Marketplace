@@ -12,13 +12,15 @@ router = APIRouter(prefix="/users")
 async def login(
 		username: str, 
 		password: str, 
-		response: Response, 
+		response: Response,
 		service: getUserDAO = Depends()
 	) -> bool:
 
 	result = await service.validatePassword(username, password)
 	if result[0] == True:
-		createToken(username, result[1], response)
+		tokens = createToken(username, result[1], response)
+		response.headers['X-Access-Token'] = tokens['access']
+		response.headers['X-Refresh-Token'] = tokens['refresh']
 		return True
 	return False
 
@@ -45,11 +47,6 @@ async def register(
 		raise HTTPException(status_code=409, detail="user already exists")
 	createToken(username, account_status, response)
 	return user
-
-@router.post("/logout") 
-async def logout(response: Response) -> None:
-	response.delete_cookie(key="access")
-	response.delete_cookie(key="refresh")
 
 @router.get("/search")
 async def getById(
@@ -81,7 +78,5 @@ async def deleteYourSelf(
 	
 	if await service.validatePassword(user, password):
 		service.deleteByUsername(user)
-		response.delete_cookie(key="access")
-		response.delete_cookie(key="refresh")
 		return True
 	return False

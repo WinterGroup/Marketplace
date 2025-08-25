@@ -66,7 +66,7 @@ async def getById(
 async def getMe(
 		me: getCurrentUser = Depends(),
 		service: getUserDAO = Depends()
-	) -> Optional[UserModel]:
+	) -> Optional[SafeUserModel]:
 
 	user = await service.getByUsername(me)
 	return toSafeModel(user) if user else None

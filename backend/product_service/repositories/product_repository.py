@@ -12,7 +12,7 @@ class ProductRepository():
 	@connection
 	async def create(self, product: ProductModel) -> Optional[ProductModel] | bool:
 		try:
-			await self.session.add(ProductTable(**product.dict()))
+			self.session.add(ProductTable(**product.dict()))
 			await self.session.commit()
 			return product
 		except sqlalchemy.exc.IntegrityError:
@@ -22,7 +22,7 @@ class ProductRepository():
 	async def delete(self, id: int) -> Optional[bool]:
 		product = await self.session.get(ProductTable, id)
 		if product:
-			await self.session.delete(product)
+			self.session.delete(product)
 			await self.session.commit()
 			return True
 		return None

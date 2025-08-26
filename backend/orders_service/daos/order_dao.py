@@ -6,20 +6,20 @@ class OrderDAO():
     def __init__(self, repository: OrderRepository) -> None:
         self.repository = repository
 
-    def create(self, order: OrderModel) -> OrderModel:
-        return self.repository.create(order)
+    async def create(self, order: OrderModel) -> OrderModel:
+        return await self.repository.create(order)
 
-    def delete(self, id: int) -> OrderModel:
-        return self.repository.delete(id)
+    async def delete(self, id: int) -> OrderModel:
+        return await self.repository.delete(id)
 
-    def getById(self, id: int) -> OrderModel:
-        return self.repository.getById(id)
+    async def getById(self, id: int) -> OrderModel:
+        return await self.repository.getById(id)
 
-    def getBySellerId(self, id: int) -> List[OrderModel]:
-        return self.repository.getBySellerId(id)
+    async def getBySellerId(self, id: int) -> List[OrderModel]:
+        return await self.repository.getBySellerId(id)
 
-    def getByBuyerId(self, id: int) -> List[OrderModel]:
-        return self.repository.getByBuyerId(id)
+    async def getByBuyerId(self, id: int) -> List[OrderModel]:
+        return await self.repository.getByBuyerId(id)
 
 def getOrderDAO() -> OrderDAO:
     return OrderDAO(getOrderRepository())

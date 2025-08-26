@@ -6,16 +6,19 @@ import uvicorn
 def app() -> FastAPI:
     app = FastAPI(root_path="/api")
     app.include_router(product_router)
-    
     @app.on_event("startup")
-    def startup():
-        Base.metadata.create_all(engine)
+    async def startup():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
     @app.on_event("shutdown")
-    def shutdown():
-        session.close()
-        
+    async def shutdown():
+        await engine.dispose()
+
     return app
 
-if __name__=="__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8002)
+app = app()
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8002, reload=True)
+

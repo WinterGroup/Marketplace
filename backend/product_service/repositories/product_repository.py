@@ -2,6 +2,7 @@ from db.session import session, connection
 from tables.product_table import ProductTable
 from models.product_model import ProductModel
 from typing import Optional, List
+from sqlalchemy import select
 import sqlalchemy
 
 class ProductRepository():
@@ -9,35 +10,37 @@ class ProductRepository():
 		self.session = session
 
 	@connection
-	def create(self, product: ProductModel) -> Optional[ProductModel] | bool:
+	async def create(self, product: ProductModel) -> Optional[ProductModel] | bool:
 		try:
-			self.session.add(UserTable(**product.dict()))
-			self.session.commit()
+			self.session.add(ProductTable(**product.dict()))
+			await self.session.commit()
 			return product
 		except sqlalchemy.exc.IntegrityError:
 			return False
 
 	@connection
-	def delete(self, id: int) -> Optional[bool]:
-		product = self.session.query(ProductTable).filter_by(id=id).first()
+	async def delete(self, id: int) -> Optional[bool]:
+		product = await self.session.get(ProductTable, id)
 		if product:
 			self.session.delete(product)
-			self.session.commit()
+			await self.session.commit()
 			return True
 		return None
 
 	@connection
-	def searchByUsername(self, username: str) -> List[ProductModel]:
-		return self.session.query(ProductTable).filter_by(username=username).all()
+	async def searchByUsername(self, username: str) -> List[ProductModel]:
+		products = await self.session.execute(select(ProductTable).where(ProductTable.username == username))
+		return products.scalars().all()
 
 	@connection
-	def getById(self, id: int) -> Optional[ProductModel]:
-		product = self.session.query(ProductTable).filter_by(id=id).first()
+	async def getById(self, id: int) -> Optional[ProductModel]:
+		product = await self.session.get(ProductTable, id)
 		return product if product else None
 
 	@connection
-	def getAll(self) -> List[ProductModel]:
-		return self.session.query(ProductTable).all()
+	async def getAll(self) -> List[ProductModel]:
+		result = await self.session.execute(select(ProductTable))
+		return result.scalars().all()
 
 def getProductRepository() -> ProductRepository:
 	return ProductRepository(session)

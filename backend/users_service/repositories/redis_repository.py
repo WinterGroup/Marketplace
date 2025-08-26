@@ -12,12 +12,12 @@ class RedisRepository():
 	
 	async def setItem(self, key: Optional[str] | int, item: BaseModel) -> BaseModel:
 		pickled = pickle.dumps(item)
-		await self.r.set(key, pickled)
+		await self.r.set(key, pickled, ex=604800)
 		return item
 
 	async def getItem(self, key: Optional[str] | int) -> Optional[BaseModel] | None:
 		item = await self.r.get(key)
-		return pickle.loads(item) if item else None
+		return pickle.loads(item)
 	
 	async def delete(self, key: Optional[str] | int) -> None:
 		await self.r.delete(key)

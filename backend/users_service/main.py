@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers.users_router import router as users_router
 from db.session import engine, Base, session
 import uvicorn
@@ -18,6 +19,18 @@ def app() -> FastAPI:
     return app
 
 app = app()
+
+origins = [
+    "http://localhost:3000",  
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,          # список разрешённых доменов
+    allow_credentials=True,         # нужны если используешь куки/сессии
+    allow_methods=["*"],            # разрешаем все методы (GET, POST, DELETE и т.д.)
+    allow_headers=["*"],            # разрешаем любые заголовки
+)
 
 if __name__ == "__main__":
 	uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

@@ -16,8 +16,8 @@ class UserRepository:
 	@connection
 	async def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		try:
-			user.password = self.f.encrypt(user.password.encode())
-			await self.session.add(User(**user.dict()))
+			user.password = self.f.encrypt(user.password.encode()).decode()
+			self.session.add(User(**user.dict()))
 			await self.session.commit()
 			return user
 		except sqlalchemy.exc.IntegrityError:
@@ -27,7 +27,7 @@ class UserRepository:
 	async def deleteByUsername(self, username: str) -> bool:
 		found = await self.session.execute(select(User).where(User.username == username)).scalar_one_or_none()
 		if found:
-			await self.session.delete(found)
+			self.session.delete(found)
 			await self.session.commit()
 			return True
 		return False
@@ -36,7 +36,7 @@ class UserRepository:
 	async def deleteById(self, id: int) -> bool:
 		found = await self.session.get(User, id)
 		if found:
-			await self.session.delete(found)
+			self.session.delete(found)
 			await self.session.commit()
 			return True
 		return False
@@ -52,8 +52,8 @@ class UserRepository:
 
 	@connection
 	async def validatePassword(self, username: str, password: str) -> Optional[list]:
-		result = await self.session(select(User).where(User.username==username))
-		user = result.scallars_one_or_none()
+		result = await self.session.execute(select(User).where(User.username==username))
+		user = result.scalar_one_or_none()
 		if user:
 			if self.f.decrypt(user.password).decode('utf-8') == password:
 				return [True, user.account_status]

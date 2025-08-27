@@ -1,18 +1,24 @@
+# Легкий образ Node.js
 FROM node:20-alpine
 
+# Рабочая директория
 WORKDIR /app
 
-# копируем package.json и lock для установки зависимостей
+# Устанавливаем зависимости для нативных модулей (иногда нужны для пакетов)
+RUN apk add --no-cache python3 make g++
+
+# Копируем только package.json и package-lock.json для кеширования npm install
 COPY package*.json ./
 
-RUN npm install
+# Ставим зависимости максимально быстро
+RUN npm ci --legacy-peer-deps
 
-# копируем весь проект
+# Копируем весь проект
 COPY . .
 
-# билдим проект
-RUN npm run build
-
+# Экспонируем порт
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Старт
+CMD ["npm", "run", "dev"]
+

@@ -16,8 +16,28 @@ def getCurrentUser(request: Request):
 	except jwt.PyJWTError:
 		raise exc
 
+def createNewRefresh(username: str) -> str:
+	return jwt.encode(
+		{
+			'username': username, 
+			"type": "refresh"
+		}, 
+		os.environ.get("JWT_KEY"), algorithm="HS256"
+	)
 
-def createToken(username: str, account_status: str, response: Response):
-	access_token = jwt.encode({"username": username, "type": "bearer", "account_status": account_status}, os.environ.get("JWT_KEY"), algorithm="HS256")
-	refresh_token = jwt.encode({"username": "username", "type": "refresh_token"}, os.environ.get("JWT_KEY"), algorithm="HS256")
-	return {'access': access_token, 'refresh': refresh_token}
+def createNewAccess(refresh_token: str) -> str:
+	try:
+		data = jwt.decode(
+			refresh_token, 
+			os.environ.get("JWT_KEY"), 
+			algorithms="HS256"
+		)
+		access_token = jwt.encode(
+			{
+				'username': data['username']
+			}, 
+			os.environ.get("JWT_KEY"), algorithm="HS256"
+		)
+		return access_token
+	except jwt.PyJWTError:
+		raise HTTPException(status=401, detail="Validation Error")

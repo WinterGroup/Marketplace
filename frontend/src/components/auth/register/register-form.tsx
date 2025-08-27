@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -17,36 +18,33 @@ export default function RegisterForm() {
     account_status: ''
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   
   const { register } = useAuth();
   const router = useRouter();
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Очищаем ошибку при изменении полей
-    if (error) setError('');
   };
 
   const validateForm = () => {
     if (!formData.username.trim()) {
-      setError('Имя пользователя обязательно');
+      toast.error('Имя пользователя обязательно');
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Email обязателен');
+      toast.error('Email обязателен');
       return false;
     }
     if (!formData.password.trim()) {
-      setError('Пароль обязателен');
+      toast.error('Пароль обязателен');
       return false;
     }
     if (!formData.account_status) {
-      setError('Выберите тип аккаунта');
+      toast.error('Выберите тип аккаунта');
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+      toast.error('Пароль должен содержать минимум 6 символов');
       return false;
     }
     return true;
@@ -54,25 +52,22 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
 
     try {
-      console.log('Отправляем данные регистрации:', formData);
-      const success = await register(formData);
-      if (success) {
+      const result = await register(formData);
+      if (result.success) {
+        toast.success('Регистрация выполнена успешно!');
         router.push('/');
       } else {
-        setError('Ошибка при регистрации');
+        toast.error(result.error || 'Ошибка при регистрации');
       }
     } catch (err: any) {
       console.error('Ошибка при создании аккаунта:', err);
-      setError(err.message || 'Ошибка при создании аккаунта');
+      toast.error(err.message || 'Ошибка при создании аккаунта');
     } finally {
       setIsLoading(false);
     }
@@ -89,12 +84,6 @@ export default function RegisterForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-              {error}
-            </div>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="username">Имя пользователя *</Label>
             <Input
@@ -150,6 +139,7 @@ export default function RegisterForm() {
               <SelectContent>
                 <SelectItem value="buyer">Покупатель</SelectItem>
                 <SelectItem value="seller">Продавец</SelectItem>
+                <SelectItem value="both">Покупатель и продавец</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -157,43 +147,20 @@ export default function RegisterForm() {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading || !formData.account_status}
+            disabled={isLoading}
           >
             {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
           </Button>
-        </form>
 
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground">
-            Уже есть аккаунт?{' '}
-            <Link href="/auth/login" className="text-foreground hover:underline">
-              Войти
-            </Link>
-          </p>
-        </div>
-
-        {/* Отладочная информация */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
-            <p className="font-medium mb-2">Отладочная информация:</p>
-            <div className="mb-2">
-              <p>Данные формы:</p>
-              <pre>{JSON.stringify(formData, null, 2)}</pre>
-            </div>
-            <div className="mb-2">
-              <p>Query параметры для API:</p>
-              <pre className="bg-white p-2 rounded border">
-                POST /api/users/register?{new URLSearchParams(formData).toString()}
-              </pre>
-            </div>
-            <div>
-              <p>Текущие cookies:</p>
-              <pre className="bg-white p-2 rounded border text-xs">
-                {document.cookie || 'Cookies отсутствуют'}
-              </pre>
-            </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              Уже есть аккаунт?{' '}
+              <Link href="/auth/login" className="text-primary hover:underline">
+                Войти
+              </Link>
+            </p>
           </div>
-        )}
+        </form>
       </div>
     </div>
   );

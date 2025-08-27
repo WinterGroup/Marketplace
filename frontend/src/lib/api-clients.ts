@@ -27,28 +27,17 @@ export interface Order {
 
 // Базовый API клиент
 class BaseApiClient {
-  protected baseUrl = 'http://localhost/api';
+  protected baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost'; // Поддержка переменных окружения
 
   protected async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    // Логируем cookies перед запросом
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Cookies перед запросом ${endpoint}:`, document.cookie);
-    }
-
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
-      credentials: 'include', // Важно для cookies
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers
       }
     });
-
-    // Логируем cookies после ответа
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Cookies после ответа ${endpoint}:`, document.cookie);
-      console.log(`Response headers для ${endpoint}:`, Object.fromEntries(response.headers.entries()));
-    }
 
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}`;
@@ -67,7 +56,6 @@ class BaseApiClient {
           ).join(', ');
         }
       } catch (parseError) {
-        // Если не удалось распарсить JSON, используем текст ответа
         try {
           const textError = await response.text();
           if (textError) {
@@ -95,8 +83,118 @@ class BaseApiClient {
   }
 }
 
-// API клиент для пользователей
+// API клиент для пользователей 
 export class UsersApi extends BaseApiClient {
+  private saveTokens(headers: Headers) {
+    const access = headers.get('X-Access-Token');
+    const refresh = headers.get('X-Refresh-Token');
+
+    console.log('Получены заголовки:', { access, refresh });
+
+    if (access) localStorage.setItem('access_token', access);
+    if (refresh) localStorage.setItem('refresh_token', refresh);
+  }
+
+  private getAccessToken() {
+    return localStorage.getItem('access_token');
+  }
+
+  private getRefreshToken() {
+    return localStorage.getItem('refresh_token');
+  }
+
+  private clearTokens() {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    console.log('Токены очищены');
+  }
+
+  async login(username: string, password: string): Promise<boolean> {
+    const queryString = this.createQueryString({ username, password });
+    console.log('Вход пользователя:', username);
+
+    const res = await fetch(`${this.baseUrl}/api/users/login?${queryString}`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || `HTTP ${res.status}`);
+    }
+
+    // Сохраняем токены из заголовков независимо от тела ответа
+    this.saveTokens(res.headers);
+
+    const success = await res.json();
+    console.log('Результат входа:', success);
+
+    return success === true;
+  }
+
+  async getCurrentUser(): Promise<User | null> {
+    const access = this.getAccessToken();
+    if (!access) return null;
+
+    try {
+      const res = await fetch(`${this.baseUrl}/api/users/me`, {
+        method: 'GET',
+        headers: {
+          'X-Access-Token': access,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+
+      if (res.status === 401) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const user = await res.json();
+      return user;
+    } catch (err) {
+      console.error('Ошибка получения текущего пользователя:', err);
+      return null;
+    }
+  }
+
+  async refresh(): Promise<boolean> {
+    const refresh = this.getRefreshToken();
+    if (!refresh) return false;
+
+    try {
+      const res = await fetch(`${this.baseUrl}/api/users/refresh`, {
+        method: 'GET',
+        headers: { 'X-Refresh-Token': refresh },
+        credentials: 'include'
+      });
+
+      if (!res.ok) return false;
+
+      this.saveTokens(res.headers);
+      return true;
+    } catch (err) {
+      console.error('Ошибка обновления токена:', err);
+      return false;
+    }
+  }
+
+  async logout(): Promise<void> {
+    const refresh = this.getRefreshToken();
+    if (!refresh) return this.clearTokens();
+
+    try {
+      await fetch(`${this.baseUrl}/api/users/logout`, {
+        method: 'POST',
+        headers: { 'X-Refresh-Token': refresh },
+        credentials: 'include'
+      });
+    } catch (err) {
+      console.error('Ошибка выхода:', err);
+    } finally {
+      this.clearTokens();
+    }
+  }
+
   async register(userData: {
     username: string;
     email: string;
@@ -104,73 +202,38 @@ export class UsersApi extends BaseApiClient {
     account_status: string;
   }): Promise<User> {
     const queryString = this.createQueryString(userData);
-    return this.request<User>(`/users/register?${queryString}`, {
-      method: 'POST'
+    console.log('Регистрация пользователя:', userData);
+  
+    const res = await fetch(`${this.baseUrl}/api/users/register?${queryString}`, {
+      method: 'POST',
+      credentials: 'include'
     });
-  }
-
-  async login(username: string, password: string): Promise<boolean> {
-    const queryString = this.createQueryString({ username, password });
-    return this.request<boolean>(`/users/login?${queryString}`, {
-      method: 'POST'
-    });
-  }
-
-  async logout(): Promise<void> {
-    return this.request<void>(`/users/logout`, {
-      method: 'POST'
-    });
-  }
-
-  async getCurrentUser(): Promise<User | null> {
-    try {
-      // Для /me endpoint добавляем специальную обработку
-      const response = await fetch(`${this.baseUrl}/users/me`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      // Логируем cookies для отладки
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Cookies для /me:', document.cookie);
-        console.log('Response status для /me:', response.status);
-        console.log('Response headers для /me:', Object.fromEntries(response.headers.entries()));
-      }
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.log('Пользователь не аутентифицирован (401)');
-          return null;
-        }
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const user = await response.json();
-      return user;
-    } catch (error) {
-      console.error('Ошибка при получении текущего пользователя:', error);
-      return null;
+  
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.detail || `HTTP ${res.status}`);
     }
+  
+    // Сохраняем токены из заголовков
+    this.saveTokens(res.headers);
+  
+    const user = await res.json();
+    console.log('Пользователь зарегистрирован:', user);
+  
+    return user;
   }
-
-  async searchUser(params: { id?: number; username?: string }): Promise<User | null> {
-    const queryString = this.createQueryString(params);
-    return this.request<User | null>(`/users/search?${queryString}`);
-  }
+  
 }
 
 // API клиент для продуктов
 export class ProductsApi extends BaseApiClient {
   async getAllProducts(): Promise<Product[]> {
-    return this.request<Product[]>(`/products/`);
+    return this.request<Product[]>(`/api/products/`);
   }
 
   async getProductById(id: number): Promise<Product | null> {
     try {
-      return await this.request<Product>(`/products/search?id=${id}`);
+      return await this.request<Product>(`/api/products/search?id=${id}`);
     } catch (error) {
       return null;
     }
@@ -178,7 +241,7 @@ export class ProductsApi extends BaseApiClient {
 
   async searchProducts(params: { username?: string; id?: number }): Promise<Product[]> {
     const queryString = this.createQueryString(params);
-    return this.request<Product[]>(`/products/search?${queryString}`);
+    return this.request<Product[]>(`/api/products/search?${queryString}`);
   }
 }
 
@@ -186,7 +249,7 @@ export class ProductsApi extends BaseApiClient {
 export class OrdersApi extends BaseApiClient {
   async getOrder(id: number): Promise<Order | null> {
     try {
-      return await this.request<Order>(`/orders/${id}`);
+      return await this.request<Order>(`/api/order/${id}`);
     } catch (error) {
       return null;
     }
@@ -199,7 +262,7 @@ export class OrdersApi extends BaseApiClient {
     });
     
     try {
-      return await this.request<Order>(`/orders/create?${queryString}`, {
+      return await this.request<Order>(`/api/order/create?${queryString}`, {
         method: 'POST'
       });
     } catch (error) {
@@ -216,13 +279,14 @@ export const ordersApi = new OrdersApi();
 // Утилиты для работы с API
 export class ApiUtils {
   static isAuthenticated(): boolean {
-    // Проверяем наличие cookies с токенами
-    return document.cookie.includes('access=') || document.cookie.includes('refresh=');
+    return !!localStorage.getItem('access_token');
   }
 
   static getAuthHeaders(): HeadersInit {
+    const token = localStorage.getItem('access_token');
     return {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      ...(token && { 'X-Access-Token': token })
     };
   }
 
@@ -236,17 +300,15 @@ export class ApiUtils {
     return 'Неизвестная ошибка';
   }
 
-  static logCookies(context: string): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[${context}] Cookies:`, document.cookie);
-      console.log(`[${context}] Все cookies:`, document.cookie.split(';').map(c => c.trim()));
-    }
+  static clearTokens(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
   }
 
-  static clearCookies(): void {
-    // Очищаем все cookies
-    document.cookie.split(";").forEach(function(c) { 
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+  static logTokens(): void {
+    console.log('Текущие токены:', {
+      access: localStorage.getItem('access_token'),
+      refresh: localStorage.getItem('refresh_token')
     });
   }
 }

@@ -6,6 +6,20 @@ import uvicorn
 
 def app() -> FastAPI:
     app = FastAPI(root_path="/api")
+
+    origins = [
+        "http://localhost:3000",   # твой Next.js
+        "http://127.0.0.1:3000",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,          # можно указать ["*"] для всех, но лучше явно
+        allow_credentials=True,
+        allow_methods=["*"],            # ["GET", "POST", ...] если хочешь ограничить
+        allow_headers=["*"],
+    )
+
     app.include_router(order_router)
     @app.on_event("startup")
     async def startup():
@@ -19,18 +33,6 @@ def app() -> FastAPI:
     return app
 
 app = app()
-
-origins = [
-    "http://localhost:3000",  
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,          # список разрешённых доменов
-    allow_credentials=True,         # нужны если используешь куки/сессии
-    allow_methods=["*"],            # разрешаем все методы (GET, POST, DELETE и т.д.)
-    allow_headers=["*"],            # разрешаем любые заголовки
-)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8003, reload=True)

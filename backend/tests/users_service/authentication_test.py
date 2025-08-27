@@ -28,3 +28,10 @@ def test_authentication():
 	}
 	me = requests.get("http://localhost/api/users/me", headers=new_headers)
 	assert login_params['username'] == dict(me.json())['username']
+
+def test_logout_first():
+	headers = {
+		'X-Refresh-Token': ''
+	}
+	response = requests.post("http://localhost/api/users/login?username=3&password=3", headers=headers)
+	assert response.text == '{"detail":"logout first"}'

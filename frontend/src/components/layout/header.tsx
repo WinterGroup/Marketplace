@@ -18,6 +18,19 @@ export default function Header() {
         router.push('/');
     };
 
+    const getAccountStatusText = (status: string) => {
+        switch (status) {
+            case 'buyer':
+                return 'Покупатель';
+            case 'seller':
+                return 'Продавец';
+            case 'both':
+                return 'Покупатель и продавец';
+            default:
+                return status;
+        }
+    };
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4">
@@ -33,12 +46,18 @@ export default function Header() {
                             </span>
                         </Link>
                         
-                        {/* Ссылка на тестовую страницу API (только для разработки) */}
-                        {process.env.NODE_ENV === 'development' && (
-                            <Link href="/test-api" className="ml-6 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                                Test API
+                        <nav className="ml-8 flex items-center space-x-6">
+                            <Link href="/products" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                                Продукты
                             </Link>
-                        )}
+                            
+                            {/* Ссылка на тестовую страницу API (только для разработки) */}
+                            {process.env.NODE_ENV === 'development' && (
+                                <Link href="/test-api" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                                    Test API
+                                </Link>
+                            )}
+                        </nav>
                     </div>
 
                     <div className="flex-1 max-w-xl mx-8">
@@ -60,9 +79,14 @@ export default function Header() {
                             </div>
                         ) : user ? (
                             <div className="flex items-center gap-3">
-                                <span className="text-sm text-muted-foreground">
-                                    {user.username} ({user.account_status === 'buyer' ? 'Покупатель' : 'Продавец'})
-                                </span>
+                                <div className="flex flex-col items-end">
+                                    <span className="text-sm font-medium text-foreground">
+                                        {user.username}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {getAccountStatusText(user.account_status)}
+                                    </span>
+                                </div>
                                 <Link href="/order">
                                     <Button variant="ghost" size="icon" className="relative hover:bg-accent">
                                         <ShoppingBag className="h-5 w-5" />

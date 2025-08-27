@@ -26,7 +26,7 @@ async def login(
 	if request.headers.get("X-Refresh-Token"):
 		raise HTTPException(status_code=401, detail="logout first")
 
-	if result[0]:
+	if result:
 		refresh = createNewRefresh(username)
 		access = createNewAccess(refresh)
 
@@ -133,6 +133,7 @@ async def refresh(
 		response.headers['X-Access-Token'] = access_token
 		return True
 	raise HTTPException(status_code=401, detail="Wrong refresh token")
+
 @router.post("/logout")
 async def logout(
 		request: Request,

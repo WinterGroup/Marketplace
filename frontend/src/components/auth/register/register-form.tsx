@@ -139,7 +139,6 @@ export default function RegisterForm() {
               <SelectContent>
                 <SelectItem value="buyer">Покупатель</SelectItem>
                 <SelectItem value="seller">Продавец</SelectItem>
-                <SelectItem value="both">Покупатель и продавец</SelectItem>
               </SelectContent>
             </Select>
           </div>

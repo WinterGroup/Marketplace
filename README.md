@@ -34,12 +34,22 @@ $ sudo docker-compose up
 ```
   GET /api/users/me
 ```
+show current profile
+
+```
+  GET /api/users/refresh
+```
+get new access token
+
 ```
   POST /api/users/logout
 ```
+log out from current user
+
 ```
-  POST /api/users/search
+  GET /api/users/search
 ```
+search users
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
@@ -55,7 +65,15 @@ $ sudo docker-compose up
 | :-------- | :------- | :------------------------- |
 | `username` | `string` | **optional**       |
 | `id` | `int` | **optional**       |
+```
+  POST /api/products/create
+```
 
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `description` | `string` | **required**       |
+| `price` | `int` | **required**       |
+| `category` | `string` | **required**       |
 ```
   GET /api/products/
 ```

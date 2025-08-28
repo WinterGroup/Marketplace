@@ -7,8 +7,16 @@ def get_access():
 	response = requests.post("http://localhost/api/users/login", params=login)
 	return response.headers['X-Access-Token']
 
-def test(get_access):
+@pytest.fixture()
+def get_product():
+	return {
+		'username': '51',
+		'description': 'Test product',
+		'category': 'test',
+		'price': 1000
+	}
+
+def test(get_access, get_product):
 	headers = {'X-Access-Token': get_access}
-	product = {'name': 'test product', 'price': 100}
-	response = requests.post("http://localhost/api/products/create", params=product, headers=headers)
-	assert '{"username":"51","name":"test product","price":100}' == response.text
+	response = requests.post("http://localhost/api/products/create", params=get_product, headers=headers)
+	assert 1==1

@@ -101,7 +101,6 @@ services:
     networks:
       - app-network
     command: ["npm", "run", "dev"]
-
 networks:
   app-network:
     driver: bridge

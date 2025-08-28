@@ -68,7 +68,9 @@ services:
     restart: unless-stopped
     networks:
       - app-network
-
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_KEY: ${JWT_KEY}
   order_service:
     build: ./backend/orders_service
     container_name: order_service
@@ -82,7 +84,9 @@ services:
     restart: unless-stopped
     networks:
       - app-network
-
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      JWT_KEY: ${JWT_KEY}
   frontend:
     build: ./frontend
     container_name: frontend

@@ -4,23 +4,21 @@ import faker
 
 fake = faker.Faker("ru_RU")
 
-def generateData() -> dict:
+@pytest.fixture()
+def fake_data() -> dict:
 	return {
-		'username': str(fake.name()), 
-		'password': "rand12312", 
-		'email': f"{fake.name()}@fake.com", 
+		'username': '51', 
+		'password': "5", 
+		'email': f"51", 
 		'account_status': "buyer"
 	}
 
 
-def test_authentication():
-	fake_data = generateData()
-
+def test_authentication(fake_data):
 	login_params = {
 		'username': fake_data['username'],
 		'password': fake_data['password']
 	}
-	register = requests.post("http://localhost/api/users/register", params=fake_data)
 	login = requests.post("http://localhost/api/users/login", params=login_params)
 	new_headers = {
 		'X-Access-Token': login.headers['x-access-token'],
@@ -29,9 +27,13 @@ def test_authentication():
 	me = requests.get("http://localhost/api/users/me", headers=new_headers)
 	assert login_params['username'] == dict(me.json())['username']
 
-def test_logout_first():
+def test_logout_first(fake_data):
 	headers = {
-		'X-Refresh-Token': ''
+		'X-Refresh-Token': 'asdsdsd'
 	}
-	response = requests.post("http://localhost/api/users/login?username=3&password=3", headers=headers)
+	login_params = {
+		'username': fake_data['username'],
+		'password': fake_data['password']
+	}
+	response = requests.post("http://localhost/api/users/login?username=51&password=5", headers=headers, params=login_params)
 	assert response.text == '{"detail":"logout first"}'

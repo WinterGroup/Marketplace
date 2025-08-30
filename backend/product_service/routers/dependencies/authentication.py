@@ -10,8 +10,7 @@ def getCurrentUser(request: Request):
 	)
 	try:	
 		if token := request.headers.get("X-Access-Token"):
-			result = jwt.decode(token, os.environ.get("JWT_KEY"), algorithms="HS256")
-			return result
+			return jwt.decode(token, str(os.environ.get("JWT_KEY")), algorithms="HS256")["username"]
 		raise exc
 	except jwt.PyJWTError:
 		raise exc

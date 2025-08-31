@@ -23,9 +23,14 @@ export default function CreateProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  const token = getToken(); // <- исправлено
+  const token = getToken();
   if (!token) {
     setError('Вы должны быть авторизованы');
+    return;
+  }
+
+  if (!user?.username) {
+    setError('Пользователь не авторизован');
     return;
   }
 
@@ -36,9 +41,8 @@ export default function CreateProductPage() {
 
     const created = await productsApi.createProduct(
       {
-        description,
         price: parseInt(price, 10),
-        category,
+        name: user.username, // <- добавили обязательный параметр
       },
       token
     );
@@ -54,6 +58,7 @@ export default function CreateProductPage() {
     setLoading(false);
   }
 };
+
 
 
   return (

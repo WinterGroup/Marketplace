@@ -231,13 +231,14 @@ export class ProductsApi extends BaseApiClient {
     return this.request<Product[]>(`/api/products/`);
   }
 
-  async getProductById(id: number): Promise<Product | null> {
-    try {
-      return await this.request<Product>(`/api/products/search?id=${id}`);
-    } catch (error) {
-      return null;
-    }
+  async getProductById(id: number, username?: string): Promise<Product | null> {
+  try {
+    return await this.request<Product>(`/api/products/search?id=${id}&name=${username}`);
+  } catch (error) {
+    return null;
   }
+}
+
 
   async searchProducts(params: { username?: string; id?: number }): Promise<Product[]> {
     const queryString = this.createQueryString(params);
@@ -245,10 +246,10 @@ export class ProductsApi extends BaseApiClient {
   }
 
   async createProduct(
-    product: { description: string; price: number; category: string },
+    product: { price: number; name: string },
     token: string
   ): Promise<Product> {
-    const queryString = this.createQueryString(product); // description=…&price=…&category=…
+    const queryString = this.createQueryString(product); 
     return this.request<Product>(`/api/products/create?${queryString}`, {
       method: "POST",
       headers: {

@@ -3,7 +3,6 @@ from daos.product_dao import getProductDAO
 from models.product_model import ProductModel
 from typing import Optional, List
 from routers.dependencies.authentication import getCurrentUser
-import datetime
 
 router = APIRouter(prefix="/products")
 
@@ -24,20 +23,10 @@ async def search(
 
 @router.post("/create")
 async def create(
-		description: str,
 		price: int,
-		category: str,
+		name: str,
 		username: getCurrentUser = Depends(),
 		service: getProductDAO = Depends()
 	) -> ProductModel:
 
-	return await service.create(
-		ProductModel(
-			username=username['username'], 
-			price=price, 
-			description=description,
-			category=category,
-			is_active=True,
-			created_at=datetime.datetime.utcnow()
-		)
-	)
+	return service.create(ProductModel(username=username, name=name, price=price))

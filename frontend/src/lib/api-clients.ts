@@ -243,6 +243,20 @@ export class ProductsApi extends BaseApiClient {
     const queryString = this.createQueryString(params);
     return this.request<Product[]>(`/api/products/search?${queryString}`);
   }
+
+  async createProduct(
+    product: { description: string; price: number; category: string },
+    token: string
+  ): Promise<Product> {
+    const queryString = this.createQueryString(product); // description=…&price=…&category=…
+    return this.request<Product>(`/api/products/create?${queryString}`, {
+      method: "POST",
+      headers: {
+        "X-Access-Token": token,
+      },
+    });
+  }
+
 }
 
 // API клиент для заказов

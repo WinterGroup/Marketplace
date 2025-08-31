@@ -2,21 +2,22 @@ from db.session import session, connection
 from tables.user_table import User
 from models.user_model import UserModel 
 from typing import Optional
-from cryptography.fernet import Fernet
+from argon2 import PasswordHasher
 from dotenv import load_dotenv
 from sqlalchemy import select
 import sqlalchemy
 import os
+from argon2.exceptions import VerifyMismatchError
 
 class UserRepository:
 	def __init__(self, session) -> None:
 		self.session = session
-		self.f = Fernet(os.environ.get("SECRET_KEY").encode())
+		self.ph = PasswordHasher()
 
 	@connection
 	async def create(self, user: UserModel) -> Optional[UserModel] | bool:
 		try:
-			user.password = self.f.encrypt(user.password.encode()).decode()
+			user.password = self.ph.hash(user.password)
 			self.session.add(User(**user.dict()))
 			await self.session.commit()
 			return user
@@ -55,9 +56,11 @@ class UserRepository:
 		result = await self.session.execute(select(User).where(User.username==username))
 		user = result.scalar_one_or_none()
 		if user:
-			if self.f.decrypt(user.password).decode('utf-8') == password:
-				return [True, user.account_status]
-			return False
+			try:
+				if self.ph.verify(user.password, password):
+					return [True, user.account_status]
+			except VerifyMismatchError:
+				return False
 		return None
 	
 def getUserRepository() -> UserRepository:

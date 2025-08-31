@@ -89,7 +89,7 @@ services:
     container_name: frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # чтобы node_modules не перезаписывались volume
+      - /app/node_modules  
     ports:
       - "3000:3000"
     environment:

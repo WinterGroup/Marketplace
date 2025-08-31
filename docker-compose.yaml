@@ -84,20 +84,20 @@ services:
     environment:
       SECRET_KEY: ${SECRET_KEY}
       JWT_KEY: ${JWT_KEY}
-  # frontend:
-  #   build: ./frontend
-  #   container_name: frontend
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules  
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     NODE_ENV: development
-  #   restart: unless-stopped
-  #   networks:
-  #     - app-network
-  #   command: ["npm", "run", "dev"]
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+    restart: unless-stopped
+    networks:
+      - app-network
+    command: ["npm", "run", "dev"]
 networks:
   app-network:
     driver: bridge

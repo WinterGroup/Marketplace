@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from sqlalchemy import select
 import sqlalchemy
 import os
+from argon2.exceptions import VerifyMismatchError
 
 class UserRepository:
 	def __init__(self, session) -> None:
@@ -55,9 +56,11 @@ class UserRepository:
 		result = await self.session.execute(select(User).where(User.username==username))
 		user = result.scalar_one_or_none()
 		if user:
-			if self.ph.verify(user.password, password):
-				return [True, user.account_status]
-			return False
+			try:
+				if self.ph.verify(user.password, password):
+					return [True, user.account_status]
+			except VerifyMismatchError:
+				return False
 		return None
 	
 def getUserRepository() -> UserRepository:

@@ -18,9 +18,7 @@ class RedisRepository:
 
     async def getItem(self, key: Union[str, int]) -> Optional[BaseModel]:
         item = await self.r.get(key)
-        if item is None:
-            return None
-        return pickle.loads(item)
+        return pickle.loads(item) if item else None
 
     async def delete(self, key: Union[str, int]) -> None:
         await self.r.delete(key)

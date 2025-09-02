@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usersApi, productsApi, ordersApi } from '../lib/api-clients';
 
+
 // Хук для API запросов
 export function useApi<T>(
   apiFunction: () => Promise<T>,
@@ -118,47 +119,61 @@ export function useUsers() {
 
 // Хук для работы с продуктами
 export function useProducts() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // загрузка всех продуктов
   const loadProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const data = await productsApi.getAllProducts();
       setProducts(data);
       return data;
     } catch (err: any) {
-      setError(err.message || 'Ошибка при загрузке продуктов');
+      setError(err.message || "Ошибка при загрузке продуктов");
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // получение продукта по ID
   const getProduct = useCallback(async (id: number) => {
     try {
       return await productsApi.getProductById(id);
     } catch (err: any) {
-      setError(err.message || 'Ошибка при загрузке продукта');
+      setError(err.message || "Ошибка при загрузке продукта");
       throw err;
     }
   }, []);
 
-  const deleteProduct = useCallback(async (id: number) => {
+  // поиск продуктов (по username или id)
+  const searchProducts = useCallback(async (params: { username?: string; id?: number }) => {
     try {
-      const success = await productsApi.deleteProduct(id);
-      if (success) {
-        setProducts(prev => prev.filter(p => p.id !== id));
-      }
-      return success;
+      return await productsApi.searchProducts(params);
     } catch (err: any) {
-      setError(err.message || 'Ошибка при удалении продукта');
-      return false;
+      setError(err.message || "Ошибка при поиске продуктов");
+      throw err;
     }
   }, []);
+
+  // создание нового продукта
+  const createProduct = useCallback(
+    async (product: { description: string; price: number; category: string }, token: string) => {
+      try {
+        const created = await productsApi.createProduct(product, token);
+        setProducts((prev) => [...prev, created]);
+        return created;
+      } catch (err: any) {
+        setError(err.message || "Ошибка при создании продукта");
+        throw err;
+      }
+    },
+    []
+  );
 
   return {
     products,
@@ -166,7 +181,8 @@ export function useProducts() {
     error,
     loadProducts,
     getProduct,
-    deleteProduct
+    searchProducts,
+    createProduct,
   };
 }
 

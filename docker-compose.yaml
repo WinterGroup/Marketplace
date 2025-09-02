@@ -35,6 +35,21 @@ services:
       - app-network
     command: redis-server --bind 0.0.0.0
 
+  confirmation_service:
+    build: ./backend/confirmation_service/
+    container_name: confirmation_service
+    volumes:
+      - ./backend/confirmation_service/:/app
+    ports:
+      - "8004:8000"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+
   users_service:
     build: ./backend/users_service/
     container_name: users_service
@@ -89,7 +104,7 @@ services:
     container_name: frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # чтобы node_modules не перезаписывались volume
+      - /app/node_modules  
     ports:
       - "3000:3000"
     environment:
